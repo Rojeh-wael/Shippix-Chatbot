@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shippix Customer Support</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 400px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            padding: 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-header h1 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #8bc34a;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border: 1px solid #e1e5e9;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .bot-avatar {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .user-avatar {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #4CAF50;
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            margin-left: 48px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quick-action {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-action:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        .order-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .order-info strong {
+            color: #495057;
+        }
+
+        @media (max-width: 480px) {
+            .chat-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Shippix Support</h1>
+            <div>
+                <span class="status-indicator"></span>
+                <small id="statusText">Connecting...</small>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-avatar bot-avatar">🤖</div>
+                <div class="message-content">
+                    👋 Hello! I'm your AI-powered Shippix support assistant. I can help you with:
+                    <div class="quick-actions">
+                        <div class="quick-action" onclick="sendQuickMessage('Track my order')">📦 Track Order</div>
+                        <div class="quick-action" onclick="sendQuickMessage('Shipping costs')">💰 Shipping Costs</div>
+                        <div class="quick-action" onclick="sendQuickMessage('Delivery time')">⏰ Delivery Time</div>
+                        <div class="quick-action" onclick="sendQuickMessage('Change address')">📍 Change Address</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your shipment..." onkeypress="handleKeyPress(event)">
+                <button class="send-button" onclick="sendMessage()" id="sendButton">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // Shippix AI Client - Connects to Backend API
+        // ============================================
+        
+        class ShippixAIClient {
+            constructor(apiUrl = 'http://localhost:5000') {
+                this.apiUrl = apiUrl;
+                this.sessionId = this.generateSessionId();
+            }
+
+            generateSessionId() {
+                return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            /**
+             * Send a chat message to the AI model backend
+             */
+            async sendMessage(message, context = {}) {
+                try {
+                    console.log('📤 Sending message to AI backend:', message);
+                    
+                    const response = await fetch(`${this.apiUrl}/api/chat`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            session_id: this.sessionId,
+                            context: context
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('📥 Received response from AI backend:', data);
+                    return data;
+                } catch (error) {
+                    console.error('❌ Error communicating with AI model:', error);
+                    throw error;
+                }
+            }
+
+            /**
+             * Track an order
+             */
+            async trackOrder(orderNumber) {
+                try {
+                    console.log('🔍 Tracking order:', orderNumber);
+                    
+                    const response = await fetch(`${this.apiUrl}/api/track`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            order_number: orderNumber
+                        })
+                    });
+
+                    const data = await response.json();
+                    console.log('📦 Order tracking result:', data);
+                    return data;
+                } catch (error) {
+                    console.error('❌ Error tracking order:', error);
+                    throw error;
+                }
+            }
+
+            /**
+             * Check if the AI model backend is healthy
+             */
+            async healthCheck() {
+                try {
+                    console.log('🏥 Checking AI backend health...');
+                    
+                    const response = await fetch(`${this.apiUrl}/api/health`, {
+                        signal: AbortSignal.timeout(5000) // 5 second timeout
+                    });
+                    
+                    const data = await response.json();
+                    console.log('✅ Health check result:', data);
+                    return data;
+                } catch (error) {
+                    console.error('❌ Health check failed:', error);
+                    return { status: 'unhealthy', error: error.message };
+                }
+            }
+        }
+
+        // ============================================
+        // Initialize AI Client
+        // ============================================
+        
+        // Change this URL to your deployed backend URL in production
+        const aiClient = new ShippixAIClient('http://localhost:5000');
+        
+        // Conversation history for context
+        let conversationHistory = [];
+
+        // ============================================
+        // UI Helper Functions
+        // ============================================
+
+        function addMessage(content, isUser = false, orderInfo = null, source = 'local') {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${isUser ? 'user-avatar' : 'bot-avatar'}`;
+            
+            // Show AI indicator for backend responses
+            if (!isUser && source === 'ai') {
+                avatar.innerHTML = '🤖';
+                avatar.title = 'AI Model Response';
+            } else if (!isUser) {
+                avatar.innerHTML = '🤖';
+            } else {
+                avatar.textContent = 'You';
+            }
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            if (orderInfo) {
+                const orderInfoDiv = document.createElement('div');
+                orderInfoDiv.className = 'order-info';
+                orderInfoDiv.innerHTML = `
+                    <strong>Order Details:</strong><br>
+                    Carrier: ${orderInfo.carrier}<br>
+                    Status: ${orderInfo.status}
+                `;
+                messageContent.appendChild(orderInfoDiv);
+            }
+            
+            // Format message with line breaks
+            messageContent.innerHTML = content.replace(/\n/g, '<br>');
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            messagesContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'flex';
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function updateStatusIndicator(statusText) {
+            const statusElement = document.getElementById('statusText');
+            if (statusElement) {
+                statusElement.innerHTML = `<span class="status-indicator"></span>${statusText}`;
+            }
+        }
+
+        // ============================================
+        // Main Chat Functions
+        // ============================================
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Disable input while processing
+            input.disabled = true;
+            document.getElementById('sendButton').disabled = true;
+            
+            // Add user message to UI
+            addMessage(message, true);
+            
+            // Store in conversation history
+            conversationHistory.push({
+                role: 'user',
+                content: message,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Clear input
+            input.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            try {
+                // Send to AI model backend
+                const result = await aiClient.sendMessage(message, {
+                    conversationHistory: conversationHistory.slice(-6) // Send last 6 messages
+                });
+                
+                hideTypingIndicator();
+                
+                // Add AI response to UI
+                addMessage(result.response, false, result.order_info, result.source);
+                
+                // Store bot response in history
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: result.response,
+                    intent: result.intent,
+                    source: result.source,
+                    timestamp: new Date().toISOString()
+                });
+                
+            } catch (error) {
+                hideTypingIndicator();
+                console.error('Error:', error);
+                
+                // Show friendly error message
+                addMessage(
+                    "⚠️ I'm sorry, I'm having trouble connecting to my AI backend right now. " +
+                    "Please make sure the backend server is running at http://localhost:5000 " +
+                    "or contact support at 1-800-SHIPPIX for immediate assistance.",
+                    false
+                );
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                document.getElementById('sendButton').disabled = false;
+                input.focus();
+            }
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('chatInput').value = message;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // ============================================
+        // Initialization
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Shippix AI Chatbot starting...');
+            console.log('📍 Backend URL:', aiClient.apiUrl);
+            console.log('🆔 Session ID:', aiClient.sessionId);
+            
+            document.getElementById('chatInput').focus();
+            
+            // Check AI model backend health
+            try {
+                updateStatusIndicator('Connecting...');
+                const health = await aiClient.healthCheck();
+                
+                if (health.status === 'healthy') {
+                    console.log('✅ AI Model Backend is online and healthy');
+                    console.log('🤖 Model:', health.model);
+                    updateStatusIndicator('🤖 AI Model Connected');
+                    
+                    setTimeout(() => {
+                        addMessage(
+                            "🎉 Connected to Shippix AI Model Backend! I'm fully powered and ready to help with your shipping questions. What can I assist you with today?",
+                            false,
+                            null,
+                            'ai'
+                        );
+                    }, 1000);
+                } else {
+                    throw new Error('Backend unhealthy');
+                }
+            } catch (error) {
+                console.error('⚠️ AI Model Backend connection failed:', error);
+                updateStatusIndicator('❌ Backend Offline');
+                
+                setTimeout(() => {
+                    addMessage(
+                        "⚠️ <strong>Backend Not Connected</strong><br><br>" +
+                        "I couldn't connect to the AI Model backend. To use the full AI features:<br><br>" +
+                        "1️⃣ Make sure Python backend is running<br>" +
+                        "2️⃣ Run: <code>python shippix_ai_backend.py</code><br>" +
+                        "3️⃣ Backend should be at: http://localhost:5000<br><br>" +
+                        "Without the backend, I have limited capabilities. Please start the backend server or contact support at 1-800-SHIPPIX.",
+                        false
+                    );
+                }, 1000);
+            }
+        });
+
+        // ============================================
+        // Optional: Periodic Health Check
+        // ============================================
+        
+        // Check backend health every 30 seconds
+        setInterval(async () => {
+            try {
+                const health = await aiClient.healthCheck();
+                if (health.status === 'healthy') {
+                    updateStatusIndicator('🤖 AI Model Connected');
+                } else {
+                    updateStatusIndicator('❌ Backend Offline');
+                }
+            } catch (error) {
+                updateStatusIndicator('❌ Backend Offline');
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
